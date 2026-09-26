@@ -74,9 +74,13 @@
 
 @layer components {
     .btn {
-        @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium no-underline;
+        @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent px-4 py-2 text-sm font-medium no-underline;
         @apply bg-button text-button-fg hover:bg-button-hover;
         @apply disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-sm {
+        @apply px-2.5 py-1 text-xs;
     }
 
     .btn-secondary {
@@ -87,9 +91,12 @@
         @apply bg-danger text-white hover:bg-danger/85;
     }
 
-    /* A button that reads as a link, for actions that must be a POST. */
-    .btn-link {
-        @apply cursor-pointer text-muted hover:text-fg;
+    .icon {
+        @apply size-4 shrink-0;
+    }
+
+    .back-link {
+        @apply inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-fg;
     }
 
     .field {
@@ -147,6 +154,46 @@
 
     .alert-danger {
         @apply border-danger/40 bg-danger/10;
+    }
+
+    /* No overflow scrolling: it would clip the active tab where it overlaps the bottom border. */
+    .tabs {
+        @apply flex border-b border-border;
+    }
+
+    .tab {
+        @apply -mb-px rounded-t-md border border-transparent px-4 py-2 text-sm font-medium whitespace-nowrap text-muted no-underline hover:text-fg;
+        @apply aria-[current=page]:border-border aria-[current=page]:border-b-bg aria-[current=page]:bg-bg aria-[current=page]:text-fg;
+    }
+
+    .card {
+        @apply rounded-md border border-border p-4;
+    }
+
+    /* Status text is mixed toward the foreground so it stays readable on its own tint. */
+    .badge {
+        @apply inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium;
+        @apply bg-subtle text-muted;
+    }
+
+    .badge-success {
+        @apply bg-success/15;
+        color: color-mix(in oklab, var(--color-success) 70%, var(--color-fg));
+    }
+
+    .badge-info {
+        @apply bg-info/15;
+        color: color-mix(in oklab, var(--color-info) 70%, var(--color-fg));
+    }
+
+    .badge-warning {
+        @apply bg-warning/20;
+        color: color-mix(in oklab, var(--color-warning) 55%, var(--color-fg));
+    }
+
+    .badge-danger {
+        @apply bg-danger/15;
+        color: color-mix(in oklab, var(--color-danger) 70%, var(--color-fg));
     }
 
     .table {
