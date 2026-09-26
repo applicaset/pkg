@@ -1,0 +1,26 @@
+@layer base {
+    :root {
+        color-scheme: light dark;
+        accent-color: var(--color-accent);
+    }
+
+    body {
+        @apply bg-bg font-sans text-fg antialiased;
+    }
+
+    h1 {
+        @apply text-2xl font-semibold tracking-tight;
+    }
+
+    h2 {
+        @apply text-lg font-semibold tracking-tight;
+    }
+
+    a {
+        @apply underline decoration-border underline-offset-4 hover:decoration-current;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-accent;
+    }
+}

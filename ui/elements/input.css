@@ -1,0 +1,9 @@
+@layer components {
+    .as-input {
+        @apply block w-full rounded-md border border-border bg-bg px-3 py-2 font-normal text-fg;
+        /* 16px keeps iOS from zooming into the field on focus. */
+        @apply text-base sm:text-sm;
+        @apply focus:border-accent focus:outline-1 focus:-outline-offset-1 focus:outline-accent;
+        @apply disabled:cursor-not-allowed disabled:bg-subtle disabled:text-muted;
+    }
+}

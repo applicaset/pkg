@@ -1,0 +1,9 @@
+@layer components {
+    .as-check {
+        @apply inline-flex items-center gap-2 text-sm;
+
+        input {
+            @apply size-4;
+        }
+    }
+}
