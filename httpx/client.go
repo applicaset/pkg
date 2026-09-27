@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	// maxErrorBytes bounds what is read from a failed response, so a dependency answering with
-	// something enormous cannot be used to exhaust this process.
+	// maxErrorBytes caps how much of a failed response is read. A huge error body from a dependency
+	// cannot exhaust this process.
 	maxErrorBytes = 8 << 10
 	// maxDrainBytes is how much of a body is read back before closing, so the connection returns
 	// to the pool instead of being dropped.
@@ -33,16 +33,15 @@ var (
 )
 
 type ClientOptions struct {
-	// Timeout bounds one call. The five-second default is set against the thirty-second write
-	// timeout of a page-serving process, leaving room to render an error page.
+	// Timeout bounds one call. The 5s default sits under the 30s write timeout of a page-serving
+	// process, leaving time to render an error page.
 	Timeout time.Duration
 	// MaxIdleConnsPerHost bounds the pool this client keeps to its one dependency.
 	MaxIdleConnsPerHost int
 }
 
-// Client calls one service. A failed call is not retried: most operations are writes on a browser
-// request's critical path, where retrying multiplies a slow dependency's load at the worst moment.
-// A caller that needs one retries deliberately at its own call site.
+// Client calls one service and never retries. Most calls are writes during a browser request, and
+// a retry multiplies load on a dependency that is already slow. A caller retries at its own site.
 type Client struct {
 	service string
 	baseURL string
@@ -73,8 +72,8 @@ func NewClient(service, baseURL string, opts ClientOptions) (*Client, error) {
 		MaxIdleConns:        idle,
 		MaxIdleConnsPerHost: idle,
 		IdleConnTimeout:     90 * time.Second,
-		// Plain HTTP/1.1 on a private network. Multiplexing over one connection buys nothing here
-		// and complicates the failure model.
+		// Plain HTTP/1.1 on a private network. Multiplexing gains nothing here and makes failures
+		// harder to reason about.
 		ForceAttemptHTTP2: false,
 	}
 
@@ -85,9 +84,8 @@ func NewClient(service, baseURL string, opts ClientOptions) (*Client, error) {
 	}, nil
 }
 
-// Call sends request as JSON to path and decodes into response, which may be nil. A domain failure
-// comes back as *Error; everything else is an ordinary wrapped error, and the two must not be
-// mistaken for each other.
+// Call POSTs request as JSON to path and decodes the answer into response, which may be nil.
+// A domain failure returns *Error. Every other failure is a plain wrapped error, never an *Error.
 func (c *Client) Call(ctx context.Context, path string, request, response any) error {
 	body, err := json.Marshal(request)
 	if err != nil {
@@ -135,7 +133,7 @@ func (c *Client) Call(ctx context.Context, path string, request, response any) e
 	return nil
 }
 
-// The request body is never included: the identity service takes a live session token in one.
+// The request body stays out of the error: an identity service request carries a session token.
 func (c *Client) wrap(path string, err error) error {
 	if err == nil {
 		return nil
@@ -144,8 +142,8 @@ func (c *Client) wrap(path string, err error) error {
 	return fmt.Errorf("%s %s: %w", c.service, path, err)
 }
 
-// Anything not positively recognised as a domain failure stays an ordinary error, which keeps "the
-// identity service is down" from being read as "no such session".
+// Only a well-formed domain failure becomes *Error. Anything else stays an ordinary error, so "the
+// identity service is down" is never read as "no such session".
 func decodeError(response *http.Response) error {
 	switch response.StatusCode {
 	case http.StatusBadRequest, http.StatusForbidden, http.StatusNotFound, http.StatusConflict:

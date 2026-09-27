@@ -1,7 +1,7 @@
 // Package ledgerapi is the wire shape of the ledger service's API: types and paths only, so the
 // service and its client share one definition without either importing the other.
 //
-// Amounts are decimal strings, never JSON numbers, which a consumer would read as floats.
+// Amounts are decimal strings, never JSON numbers. A consumer would read a number as a float.
 package ledgerapi
 
 import "time"

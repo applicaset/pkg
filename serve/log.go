@@ -22,7 +22,7 @@ func NewLogger(cfg config.Log) *slog.Logger {
 		handler = slogcolor.NewHandler(os.Stdout, &slogcolor.Options{
 			Level:      cfg.Level,
 			TimeFormat: time.RFC3339,
-			// Colour is an escape sequence that means nothing in a file or a log collector.
+			// Colour escape codes are noise in a file or a log collector.
 			NoColor: !isTerminal(os.Stdout),
 		})
 	}
@@ -30,8 +30,8 @@ func NewLogger(cfg config.Log) *slog.Logger {
 	return slog.New(requestIDHandler{Handler: handler})
 }
 
-// requestIDHandler copies the request identifier out of the context onto every record, so services
-// never learn the field exists and lines about one request still share an identifier.
+// requestIDHandler adds the context's request identifier to every record. Services never touch the
+// field, yet all lines about one request share it.
 type requestIDHandler struct {
 	slog.Handler
 }

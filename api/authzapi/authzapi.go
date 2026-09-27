@@ -42,7 +42,7 @@ type ResourceRequest struct {
 	Resource string `json:"resource"`
 }
 
-// Role names only; a description has no consumer.
+// RolesResponse carries role names only. No caller reads a description.
 type RolesResponse struct {
 	Roles []string `json:"roles"`
 }

@@ -103,8 +103,8 @@ func (Postgres) Unlock(ctx context.Context, conn *sql.Conn, table string) error 
 	return nil
 }
 
-// The bookkeeping table name is the granularity wanted: two services in one database hold different
-// locks, two replicas of one service hold the same. The key only has to be stable across releases.
+// The key derives from the bookkeeping table name. Two services in one database get different
+// locks; two replicas of one service share one. The key must stay stable across releases.
 func advisoryKey(table string) int64 {
 	hash := fnv.New64a()
 	hash.Write([]byte("sqlmigrate:" + table))

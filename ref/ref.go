@@ -61,7 +61,7 @@ func Parse(s string) (Ref, error) {
 		)
 	}
 
-	// RFC 8141 makes the scheme case-insensitive, but every stored reference is produced here, so
+	// RFC 8141 makes the scheme case-insensitive. Every stored reference comes from this package, so
 	// requiring lowercase keeps string comparison and indexing exact.
 	if segments[0] != prefix {
 		return Ref{}, fmt.Errorf("%w: want %q prefix, got %q", ErrInvalid, prefix, segments[0])

@@ -2,8 +2,8 @@
 // service and its client share one definition without either importing the other.
 package authapi
 
-// The operations the site needs. Registering, authenticating, session creation, password change and
-// setup are deliberately absent: they belong to the identity service's own pages.
+// Paths the site calls. Registering, authenticating, session creation, password change and setup
+// are left out on purpose: the identity service's own pages handle them.
 const (
 	PathResolveSession = "/v1/resolve-session"
 	PathGetUser        = "/v1/get-user"
@@ -24,8 +24,8 @@ type User struct {
 	Name     string `json:"name"`
 }
 
-// ResolveSessionRequest carries a live session token. It travels in the body so it cannot reach an
-// access log, a Referer header or a proxy's error page. Nothing may log this struct.
+// ResolveSessionRequest carries a live session token. Nothing may log it. The token rides in the
+// body to stay out of access logs, Referer headers and proxy error pages.
 type ResolveSessionRequest struct {
 	Token string `json:"token"`
 }

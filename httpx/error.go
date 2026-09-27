@@ -1,12 +1,12 @@
-// Package httpx is the contract between services: a JSON request, a JSON response, and one shape
-// for a failure the request rather than the system is at fault for. It imports nothing but the
-// standard library and pkg/reqid, so no service ends up depending on another.
+// Package httpx is the contract between services: a JSON request, a JSON response, and one error
+// shape for failures caused by the request, not the system. It imports only the standard library
+// and pkg/reqid, so no service ends up depending on another.
 package httpx
 
 import "net/http"
 
-// Code is the wire vocabulary: the only ways a request, rather than the system, can be at fault.
-// Anything else is a failure and must never be mistaken for an answer.
+// Code lists the only ways a request, not the system, can be at fault. Any other failure must never
+// be read as an answer.
 type Code string
 
 const (
@@ -51,7 +51,7 @@ type Envelope struct {
 }
 
 // Error is what a client returns for a well-formed domain failure. Anything else comes back as an
-// ordinary wrapped error, which is what keeps "the service is down" from being read as an answer.
+// ordinary wrapped error, so "the service is down" is never read as an answer.
 type Error struct {
 	Code    Code
 	Message string

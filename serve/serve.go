@@ -1,6 +1,6 @@
-// Package serve is the part of running a service that has nothing to do with what the service does:
-// a logger, a listener with sane timeouts, request tagging, panic recovery, request logging, health
-// probes and a graceful shutdown. Sharing it keeps the binaries from drifting apart.
+// Package serve runs the parts of a service unrelated to its domain: a logger, a listener with
+// timeouts, request IDs, panic recovery, request logging, health probes and graceful shutdown.
+// Sharing it keeps every binary's behaviour the same.
 package serve
 
 import (
@@ -42,7 +42,7 @@ type Options struct {
 	Background []func(context.Context)
 }
 
-// A wedged database must fail the probe rather than pile up connections.
+// A hung database must fail the probe instead of piling up connections.
 const readyTimeout = 2 * time.Second
 
 // Handler assembles the routes, the health probes and the middleware. It is separate from Run so a

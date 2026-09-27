@@ -81,7 +81,8 @@ func (c Config) Validate() error {
 	return nil
 }
 
-// schema names the Postgres schema this service owns, and is ignored by SQLite.
+// Open opens the configured database. schema names the Postgres schema this service owns; SQLite
+// ignores it.
 func Open(ctx context.Context, cfg Config, schema string) (*sql.DB, error) {
 	switch cfg.Driver {
 	case DriverSQLite:

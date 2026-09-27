@@ -1,5 +1,5 @@
 // Package asset serves an embedded static file under a URL that changes with its content, so
-// browsers may cache it for good.
+// browsers can cache it forever.
 package asset
 
 import (

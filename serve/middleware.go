@@ -9,8 +9,8 @@ import (
 	"github.com/buildset/buildset/pkg/reqid"
 )
 
-// An inbound identifier is honoured only when trustInbound is set: right for an internal API a
-// sibling calls, wrong for anything a browser reaches, where any client could pick its own.
+// WithRequestID honours an inbound identifier only when trustInbound is set. Set it for an internal
+// API a sibling calls, never for anything a browser reaches: any client could pick its own.
 func WithRequestID(trustInbound bool, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := ""
@@ -74,9 +74,8 @@ func RecoverPanics(logger *slog.Logger, next http.Handler) http.Handler {
 	})
 }
 
-// Method, path, status and duration, and nothing else: the identity service takes a live session
-// token in a request body, so logging bodies or headers would put credentials in every log. Add a
-// field here only after checking what can reach it.
+// LogRequests logs method, path, status and duration only. Identity service request bodies carry
+// live session tokens, so logging bodies or headers leaks credentials. Check before adding a field.
 func LogRequests(logger *slog.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

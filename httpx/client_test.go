@@ -51,9 +51,8 @@ func TestCallDecodesASuccess(t *testing.T) {
 	assert.Equal(t, "pong", response.Value)
 }
 
-// This is the contract. web/session.go refuses to treat a visitor as anonymous unless the identity
-// service positively said "no such session"; every other outcome must stay a failure, or a service
-// being down silently signs everybody out.
+// web/session.go treats a visitor as anonymous only when the identity service says "no such
+// session". Every other outcome must stay a failure, or an outage silently signs everybody out.
 func TestCallOnlyReportsADomainErrorForAWellFormedEnvelope(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -194,8 +193,8 @@ func TestCallReportsAnUnreachableServiceAsAFailure(t *testing.T) {
 }
 
 func TestCallReportsACancelledContextAsAFailure(t *testing.T) {
-	// The handler holds the request open until the test is done with it. Closing release first
-	// lets the handler return, so shutting the server down cannot block on it.
+	// The handler holds the request open until release closes. Cleanup closes it before the server,
+	// so server shutdown cannot block on the handler.
 	release := make(chan struct{})
 
 	client := newClient(t, func(w http.ResponseWriter, r *http.Request) {

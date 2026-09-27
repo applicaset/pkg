@@ -1,6 +1,5 @@
-// Package config holds the settings blocks that more than one binary needs, so the composition
-// roots share one definition of what PORT or DATABASE_DSN means. A binary embeds the blocks it
-// needs and adds its own fields.
+// Package config holds settings blocks shared by more than one binary, so every binary reads PORT
+// or DATABASE_DSN the same way. A binary embeds the blocks it needs and adds its own fields.
 package config
 
 import (
@@ -23,8 +22,8 @@ const SessionCookieName = "ms_session"
 
 var errInvalidConfig = errors.New("invalid configuration")
 
-// Port stays the string the environment gave: that is what net.Listen wants, and it lets PORT name
-// a service ("http") as well as a number.
+// Server keeps Port as the raw environment string. net.Listen takes a string, and PORT may name a
+// service ("http") as well as a number.
 type Server struct {
 	Host            string
 	Port            string
@@ -99,7 +98,8 @@ func LoadCookie() Cookie {
 	}
 }
 
-// A missing or malformed value is a start-up failure rather than a 500 on a visitor's first click.
+// LoadURL reads an http or https URL from key. A missing or malformed value fails at start-up, not
+// as a 500 on a visitor's first click.
 func LoadURL(key string) (string, error) {
 	raw := env.GetString(key, "")
 	if raw == "" {

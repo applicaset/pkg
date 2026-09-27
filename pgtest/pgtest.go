@@ -1,6 +1,5 @@
-// Package pgtest gives the Postgres repository tests a database to run against. It starts one
-// container per test binary and hands each test its own schema, so tests stay isolated without a
-// container each and without truncating between them.
+// Package pgtest gives Postgres repository tests a database. One container serves a test binary,
+// and each test gets its own schema: isolation without a container per test or truncating.
 package pgtest
 
 import (
@@ -30,21 +29,21 @@ var (
 	errContainer  error
 )
 
-// DSN starts the container on first use, one per test package; the reaper removes it when the test
-// binary exits.
+// DSN starts the container on first use, one per test package. The testcontainers reaper removes it
+// when the test binary exits.
 func DSN(t *testing.T) string {
 	t.Helper()
 
 	containerOnce.Do(func() {
-		// Deliberately not t.Context: the container outlives the test that happened to start it.
+		// Not t.Context: the container outlives the test that started it.
 		ctx := context.Background()
 
 		container, err := postgrestc.Run(ctx, image,
 			postgrestc.WithDatabase("buildset_test"),
 			postgrestc.WithUsername("postgres"),
 			postgrestc.WithPassword("postgres"),
-			// C collation, so text identifiers order by byte exactly as they do under SQLite, which
-			// the shared conformance suite depends on.
+			// C collation sorts text identifiers by byte, as SQLite does. The shared conformance
+			// suite depends on that order.
 			testcontainers.WithEnv(map[string]string{
 				"POSTGRES_INITDB_ARGS": "--locale=C --encoding=UTF8",
 			}),

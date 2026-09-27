@@ -4,8 +4,7 @@ package contentapi
 
 import "time"
 
-// Rendering a body is not here: it is a pure function, so a consumer renders locally through
-// content/render.
+// No render path: rendering is a pure function, so a consumer calls content/render locally.
 const (
 	PathGetPost    = "/v1/get-post"
 	PathListPosts  = "/v1/list-posts"

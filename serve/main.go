@@ -16,8 +16,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// The service images have no shell, so this is how a container healthcheck asks whether the process
-// inside it is ready.
+// The service images have no shell. A container healthcheck runs the binary with this flag to ask
+// whether the process is ready.
 const healthcheckFlag = "-healthcheck"
 
 var errNotReady = errors.New("service is not ready")
@@ -52,8 +52,8 @@ func loadDotEnv() {
 	}
 }
 
-// Healthcheck asks this process's own readiness probe, loading the server settings the same way the
-// server does so the two cannot disagree about where to look.
+// Healthcheck probes the local server's /readyz. It loads the server settings the same way the
+// server does, so both agree on the port.
 func Healthcheck() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
