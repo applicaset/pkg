@@ -7,25 +7,33 @@ package ledgerapi
 import "time"
 
 const (
-	PathCreateWallet      = "/v1/create-wallet"
-	PathRenameWallet      = "/v1/rename-wallet"
-	PathDeleteWallet      = "/v1/delete-wallet"
-	PathGetWallet         = "/v1/get-wallet"
-	PathListWallets       = "/v1/list-wallets"
-	PathCreateCategory    = "/v1/create-category"
-	PathRenameCategory    = "/v1/rename-category"
-	PathDeleteCategory    = "/v1/delete-category"
-	PathGetCategory       = "/v1/get-category"
-	PathListCategories    = "/v1/list-categories"
-	PathCreateTransaction = "/v1/create-transaction"
-	PathUpdateTransaction = "/v1/update-transaction"
-	PathDeleteTransaction = "/v1/delete-transaction"
-	PathGetTransaction    = "/v1/get-transaction"
-	PathListTransactions  = "/v1/list-transactions"
-	PathCreateTransfer    = "/v1/create-transfer"
-	PathGetTransfer       = "/v1/get-transfer"
-	PathUpdateTransfer    = "/v1/update-transfer"
-	PathSummarize         = "/v1/summarize"
+	PathCreateWallet     = "/v1/create-wallet"
+	PathRenameWallet     = "/v1/rename-wallet"
+	PathDeleteWallet     = "/v1/delete-wallet"
+	PathGetWallet        = "/v1/get-wallet"
+	PathListWallets      = "/v1/list-wallets"
+	PathCreateCategory   = "/v1/create-category"
+	PathUpdateCategory   = "/v1/update-category"
+	PathDeleteCategory   = "/v1/delete-category"
+	PathGetCategory      = "/v1/get-category"
+	PathListCategories   = "/v1/list-categories"
+	PathCreateExpense    = "/v1/create-expense"
+	PathUpdateExpense    = "/v1/update-expense"
+	PathDeleteExpense    = "/v1/delete-expense"
+	PathGetExpense       = "/v1/get-expense"
+	PathListExpenses     = "/v1/list-expenses"
+	PathCreateIncome     = "/v1/create-income"
+	PathUpdateIncome     = "/v1/update-income"
+	PathDeleteIncome     = "/v1/delete-income"
+	PathGetIncome        = "/v1/get-income"
+	PathListIncomes      = "/v1/list-incomes"
+	PathCreateTransfer   = "/v1/create-transfer"
+	PathUpdateTransfer   = "/v1/update-transfer"
+	PathDeleteTransfer   = "/v1/delete-transfer"
+	PathGetTransfer      = "/v1/get-transfer"
+	PathListTransfers    = "/v1/list-transfers"
+	PathListTransactions = "/v1/list-transactions"
+	PathSummarize        = "/v1/summarize"
 )
 
 type Wallet struct {
@@ -43,24 +51,66 @@ type Category struct {
 	ID        string    `json:"id"`
 	OwnerRef  string    `json:"owner_ref"`
 	Name      string    `json:"name"`
+	Color     string    `json:"color"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type Transaction struct {
+type Expense struct {
 	Ref        string            `json:"ref"`
 	ID         string            `json:"id"`
 	OwnerRef   string            `json:"owner_ref"`
 	WalletID   string            `json:"wallet_id"`
-	Kind       string            `json:"kind"`
 	Amount     string            `json:"amount"`
 	CategoryID string            `json:"category_id,omitempty"`
+	RefundOf   string            `json:"refund_of,omitempty"`
 	Note       string            `json:"note"`
 	OccurredAt time.Time         `json:"occurred_at"`
 	Metadata   map[string]string `json:"metadata,omitempty"`
-	TransferID string            `json:"transfer_id,omitempty"`
 	CreatedAt  time.Time         `json:"created_at"`
 	UpdatedAt  time.Time         `json:"updated_at"`
+}
+
+type Income struct {
+	Ref        string            `json:"ref"`
+	ID         string            `json:"id"`
+	OwnerRef   string            `json:"owner_ref"`
+	WalletID   string            `json:"wallet_id"`
+	Amount     string            `json:"amount"`
+	Note       string            `json:"note"`
+	OccurredAt time.Time         `json:"occurred_at"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
+	CreatedAt  time.Time         `json:"created_at"`
+	UpdatedAt  time.Time         `json:"updated_at"`
+}
+
+type Transfer struct {
+	Ref            string    `json:"ref"`
+	ID             string    `json:"id"`
+	OwnerRef       string    `json:"owner_ref"`
+	FromWalletID   string    `json:"from_wallet_id"`
+	ToWalletID     string    `json:"to_wallet_id"`
+	Amount         string    `json:"amount"`
+	ReceivedAmount string    `json:"received_amount"`
+	Note           string    `json:"note"`
+	OccurredAt     time.Time `json:"occurred_at"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}
+
+// Transaction is one movement of money in a wallet, read only. Exactly one of ExpenseID, IncomeID
+// and TransferID is set.
+type Transaction struct {
+	Ref        string    `json:"ref"`
+	ID         string    `json:"id"`
+	OwnerRef   string    `json:"owner_ref"`
+	WalletID   string    `json:"wallet_id"`
+	Amount     string    `json:"amount"`
+	OccurredAt time.Time `json:"occurred_at"`
+	ExpenseID  string    `json:"expense_id,omitempty"`
+	IncomeID   string    `json:"income_id,omitempty"`
+	TransferID string    `json:"transfer_id,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // OwnedRequest names one record of one owner.
@@ -79,6 +129,14 @@ type RenameRequest struct {
 	Name     string `json:"name"`
 }
 
+// ListRequest narrows a listing to one owner, and optionally one wallet and the period [From, To).
+type ListRequest struct {
+	OwnerRef string    `json:"owner_ref"`
+	WalletID string    `json:"wallet_id,omitempty"`
+	From     time.Time `json:"from"`
+	To       time.Time `json:"to"`
+}
+
 type CreateWalletRequest struct {
 	OwnerRef string `json:"owner_ref"`
 	Name     string `json:"name"`
@@ -93,9 +151,12 @@ type ListWalletsResponse struct {
 	Wallets []Wallet `json:"wallets"`
 }
 
-type CreateCategoryRequest struct {
+// CategoryRequest creates a category, or updates the one named by ID.
+type CategoryRequest struct {
+	ID       string `json:"id,omitempty"`
 	OwnerRef string `json:"owner_ref"`
 	Name     string `json:"name"`
+	Color    string `json:"color"`
 }
 
 type CategoryResponse struct {
@@ -106,35 +167,47 @@ type ListCategoriesResponse struct {
 	Categories []Category `json:"categories"`
 }
 
-// TransactionRequest creates a transaction, or updates the one named by ID.
-type TransactionRequest struct {
+// ExpenseRequest creates an expense, or updates the one named by ID.
+type ExpenseRequest struct {
 	ID         string            `json:"id,omitempty"`
 	OwnerRef   string            `json:"owner_ref"`
 	WalletID   string            `json:"wallet_id"`
-	Kind       string            `json:"kind"`
 	Amount     string            `json:"amount"`
 	CategoryID string            `json:"category_id,omitempty"`
+	RefundOf   string            `json:"refund_of,omitempty"`
 	Note       string            `json:"note"`
 	OccurredAt time.Time         `json:"occurred_at"`
 	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
-type TransactionResponse struct {
-	Transaction Transaction `json:"transaction"`
+type ExpenseResponse struct {
+	Expense Expense `json:"expense"`
 }
 
-type ListTransactionsRequest struct {
-	OwnerRef string    `json:"owner_ref"`
-	WalletID string    `json:"wallet_id,omitempty"`
-	From     time.Time `json:"from"`
-	To       time.Time `json:"to"`
+type ListExpensesResponse struct {
+	Expenses []Expense `json:"expenses"`
 }
 
-type ListTransactionsResponse struct {
-	Transactions []Transaction `json:"transactions"`
+// IncomeRequest creates income, or updates the one named by ID.
+type IncomeRequest struct {
+	ID         string            `json:"id,omitempty"`
+	OwnerRef   string            `json:"owner_ref"`
+	WalletID   string            `json:"wallet_id"`
+	Amount     string            `json:"amount"`
+	Note       string            `json:"note"`
+	OccurredAt time.Time         `json:"occurred_at"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
-// TransferRequest creates a transfer, or updates the one either half named by ID belongs to.
+type IncomeResponse struct {
+	Income Income `json:"income"`
+}
+
+type ListIncomesResponse struct {
+	Incomes []Income `json:"incomes"`
+}
+
+// TransferRequest creates a transfer, or updates the one named by ID.
 type TransferRequest struct {
 	ID           string `json:"id,omitempty"`
 	OwnerRef     string `json:"owner_ref"`
@@ -148,9 +221,15 @@ type TransferRequest struct {
 }
 
 type TransferResponse struct {
-	ID  string      `json:"id"`
-	Out Transaction `json:"out"`
-	In  Transaction `json:"in"`
+	Transfer Transfer `json:"transfer"`
+}
+
+type ListTransfersResponse struct {
+	Transfers []Transfer `json:"transfers"`
+}
+
+type ListTransactionsResponse struct {
+	Transactions []Transaction `json:"transactions"`
 }
 
 type SummarizeRequest struct {
@@ -167,24 +246,20 @@ type WalletBalance struct {
 type CategoryShare struct {
 	CategoryID string `json:"category_id,omitempty"`
 	Name       string `json:"name,omitempty"`
+	Color      string `json:"color,omitempty"`
 	Amount     string `json:"amount"`
 	Percent    string `json:"percent"`
 }
 
-type KindSummary struct {
+type Spending struct {
+	Currency   string          `json:"currency"`
 	Total      string          `json:"total"`
 	Categories []CategoryShare `json:"categories"`
 }
 
-type CurrencySummary struct {
-	Currency string      `json:"currency"`
-	Income   KindSummary `json:"income"`
-	Expense  KindSummary `json:"expense"`
-}
-
 type SummaryResponse struct {
-	Wallets    []WalletBalance   `json:"wallets"`
-	Currencies []CurrencySummary `json:"currencies"`
+	Wallets  []WalletBalance `json:"wallets"`
+	Spending []Spending      `json:"spending"`
 }
 
 // Empty is the request or response of an operation that carries nothing.
