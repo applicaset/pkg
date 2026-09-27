@@ -127,3 +127,23 @@ func LoadURL(key string) (string, error) {
 	// A trailing slash would double up when a path is appended.
 	return strings.TrimRight(raw, "/"), nil
 }
+
+// LoadBasePath reads BASE_PATH, where a gateway mounts a site: empty for the root, or a path such as
+// "/blog". A trailing slash would double up when a route is appended.
+func LoadBasePath() (string, error) {
+	raw := env.GetString("BASE_PATH", "")
+	if raw == "" {
+		return "", nil
+	}
+
+	if !strings.HasPrefix(raw, "/") || strings.HasSuffix(raw, "/") ||
+		strings.ContainsAny(raw, "?#") {
+		return "", fmt.Errorf(
+			"%w: BASE_PATH must start with / and not end with one, got %q",
+			errInvalidConfig,
+			raw,
+		)
+	}
+
+	return raw, nil
+}

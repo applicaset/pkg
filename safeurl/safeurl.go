@@ -39,3 +39,14 @@ func Next(raw string) string {
 
 	return parsed.RequestURI()
 }
+
+// WithNext links to page with next as its return target, or to page alone when next would only
+// fall back to the home page.
+func WithNext(page, next string) string {
+	target := Next(next)
+	if target == "/" {
+		return page
+	}
+
+	return page + "?next=" + url.QueryEscape(target)
+}
