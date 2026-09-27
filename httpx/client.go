@@ -148,7 +148,7 @@ func (c *Client) wrap(path string, err error) error {
 // identity service is down" from being read as "no such session".
 func decodeError(response *http.Response) error {
 	switch response.StatusCode {
-	case http.StatusBadRequest, http.StatusNotFound, http.StatusConflict:
+	case http.StatusBadRequest, http.StatusForbidden, http.StatusNotFound, http.StatusConflict:
 	default:
 		return fmt.Errorf("%w: status %d", errUnexpectedAnswer, response.StatusCode)
 	}

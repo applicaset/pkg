@@ -7,6 +7,23 @@ package ledgerapi
 import "time"
 
 const (
+	PathCreateProject     = "/v1/create-project"
+	PathGetProject        = "/v1/get-project"
+	PathListProjects      = "/v1/list-projects"
+	PathRenameProject     = "/v1/rename-project"
+	PathDeleteProject     = "/v1/delete-project"
+	PathLeaveProject      = "/v1/leave-project"
+	PathListMembers       = "/v1/list-members"
+	PathSetMemberRole     = "/v1/set-member-role"
+	PathRemoveMember      = "/v1/remove-member"
+	PathTransferOwnership = "/v1/transfer-ownership"
+	PathInvite            = "/v1/invite"
+	PathListInvitations   = "/v1/list-invitations"
+	PathCancelInvitation  = "/v1/cancel-invitation"
+	PathListMyInvitations = "/v1/list-my-invitations"
+	PathAcceptInvitation  = "/v1/accept-invitation"
+	PathDeclineInvitation = "/v1/decline-invitation"
+
 	PathCreateWallet     = "/v1/create-wallet"
 	PathRenameWallet     = "/v1/rename-wallet"
 	PathDeleteWallet     = "/v1/delete-wallet"
@@ -39,7 +56,8 @@ const (
 type Wallet struct {
 	Ref       string    `json:"ref"`
 	ID        string    `json:"id"`
-	OwnerRef  string    `json:"owner_ref"`
+	ProjectID string    `json:"project_id"`
+	CreatedBy string    `json:"created_by"`
 	Name      string    `json:"name"`
 	Currency  string    `json:"currency"`
 	CreatedAt time.Time `json:"created_at"`
@@ -49,7 +67,8 @@ type Wallet struct {
 type Category struct {
 	Ref       string    `json:"ref"`
 	ID        string    `json:"id"`
-	OwnerRef  string    `json:"owner_ref"`
+	ProjectID string    `json:"project_id"`
+	CreatedBy string    `json:"created_by"`
 	Name      string    `json:"name"`
 	Color     string    `json:"color"`
 	CreatedAt time.Time `json:"created_at"`
@@ -59,7 +78,8 @@ type Category struct {
 type Expense struct {
 	Ref        string            `json:"ref"`
 	ID         string            `json:"id"`
-	OwnerRef   string            `json:"owner_ref"`
+	ProjectID  string            `json:"project_id"`
+	CreatedBy  string            `json:"created_by"`
 	WalletID   string            `json:"wallet_id"`
 	Amount     string            `json:"amount"`
 	CategoryID string            `json:"category_id,omitempty"`
@@ -74,7 +94,8 @@ type Expense struct {
 type Income struct {
 	Ref        string            `json:"ref"`
 	ID         string            `json:"id"`
-	OwnerRef   string            `json:"owner_ref"`
+	ProjectID  string            `json:"project_id"`
+	CreatedBy  string            `json:"created_by"`
 	WalletID   string            `json:"wallet_id"`
 	Amount     string            `json:"amount"`
 	Note       string            `json:"note"`
@@ -87,7 +108,8 @@ type Income struct {
 type Transfer struct {
 	Ref            string    `json:"ref"`
 	ID             string    `json:"id"`
-	OwnerRef       string    `json:"owner_ref"`
+	ProjectID      string    `json:"project_id"`
+	CreatedBy      string    `json:"created_by"`
 	FromWalletID   string    `json:"from_wallet_id"`
 	ToWalletID     string    `json:"to_wallet_id"`
 	Amount         string    `json:"amount"`
@@ -103,7 +125,7 @@ type Transfer struct {
 type Transaction struct {
 	Ref        string    `json:"ref"`
 	ID         string    `json:"id"`
-	OwnerRef   string    `json:"owner_ref"`
+	ProjectID  string    `json:"project_id"`
 	WalletID   string    `json:"wallet_id"`
 	Amount     string    `json:"amount"`
 	OccurredAt time.Time `json:"occurred_at"`
@@ -113,32 +135,38 @@ type Transaction struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
-// OwnedRequest names one record of one owner.
-type OwnedRequest struct {
-	OwnerRef string `json:"owner_ref"`
-	ID       string `json:"id"`
+// Access names who asks and the project they ask about. Every request about a project carries it.
+type Access struct {
+	ActorRef  string `json:"actor_ref"`
+	ProjectID string `json:"project_id"`
 }
 
-type OwnerRequest struct {
-	OwnerRef string `json:"owner_ref"`
+// RecordRequest names one record, or one invitation, of a project.
+type RecordRequest struct {
+	Access
+	ID string `json:"id"`
+}
+
+type ProjectRequest struct {
+	Access
 }
 
 type RenameRequest struct {
-	OwnerRef string `json:"owner_ref"`
-	ID       string `json:"id"`
-	Name     string `json:"name"`
+	Access
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
-// ListRequest narrows a listing to one owner, and optionally one wallet and the period [From, To).
+// ListRequest narrows a listing to one project, and optionally one wallet and the period [From, To).
 type ListRequest struct {
-	OwnerRef string    `json:"owner_ref"`
+	Access
 	WalletID string    `json:"wallet_id,omitempty"`
 	From     time.Time `json:"from"`
 	To       time.Time `json:"to"`
 }
 
 type CreateWalletRequest struct {
-	OwnerRef string `json:"owner_ref"`
+	Access
 	Name     string `json:"name"`
 	Currency string `json:"currency"`
 }
@@ -153,10 +181,10 @@ type ListWalletsResponse struct {
 
 // CategoryRequest creates a category, or updates the one named by ID.
 type CategoryRequest struct {
-	ID       string `json:"id,omitempty"`
-	OwnerRef string `json:"owner_ref"`
-	Name     string `json:"name"`
-	Color    string `json:"color"`
+	ID string `json:"id,omitempty"`
+	Access
+	Name  string `json:"name"`
+	Color string `json:"color"`
 }
 
 type CategoryResponse struct {
@@ -169,8 +197,8 @@ type ListCategoriesResponse struct {
 
 // ExpenseRequest creates an expense, or updates the one named by ID.
 type ExpenseRequest struct {
-	ID         string            `json:"id,omitempty"`
-	OwnerRef   string            `json:"owner_ref"`
+	ID string `json:"id,omitempty"`
+	Access
 	WalletID   string            `json:"wallet_id"`
 	Amount     string            `json:"amount"`
 	CategoryID string            `json:"category_id,omitempty"`
@@ -190,8 +218,8 @@ type ListExpensesResponse struct {
 
 // IncomeRequest creates income, or updates the one named by ID.
 type IncomeRequest struct {
-	ID         string            `json:"id,omitempty"`
-	OwnerRef   string            `json:"owner_ref"`
+	ID string `json:"id,omitempty"`
+	Access
 	WalletID   string            `json:"wallet_id"`
 	Amount     string            `json:"amount"`
 	Note       string            `json:"note"`
@@ -209,8 +237,8 @@ type ListIncomesResponse struct {
 
 // TransferRequest creates a transfer, or updates the one named by ID.
 type TransferRequest struct {
-	ID           string `json:"id,omitempty"`
-	OwnerRef     string `json:"owner_ref"`
+	ID string `json:"id,omitempty"`
+	Access
 	FromWalletID string `json:"from_wallet_id"`
 	ToWalletID   string `json:"to_wallet_id"`
 	Amount       string `json:"amount"`
@@ -233,9 +261,9 @@ type ListTransactionsResponse struct {
 }
 
 type SummarizeRequest struct {
-	OwnerRef string    `json:"owner_ref"`
-	From     time.Time `json:"from"`
-	To       time.Time `json:"to"`
+	Access
+	From time.Time `json:"from"`
+	To   time.Time `json:"to"`
 }
 
 type WalletBalance struct {
@@ -260,6 +288,117 @@ type Spending struct {
 type SummaryResponse struct {
 	Wallets  []WalletBalance `json:"wallets"`
 	Spending []Spending      `json:"spending"`
+}
+
+type Project struct {
+	Ref       string    `json:"ref"`
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// Membership is a project with the role the asking user holds in it: owner, editor or viewer.
+type Membership struct {
+	Project Project `json:"project"`
+	Role    string  `json:"role"`
+}
+
+type Member struct {
+	ProjectID string    `json:"project_id"`
+	UserRef   string    `json:"user_ref"`
+	Role      string    `json:"role"`
+	JoinedAt  time.Time `json:"joined_at"`
+}
+
+type Invitation struct {
+	Ref        string    `json:"ref"`
+	ID         string    `json:"id"`
+	ProjectID  string    `json:"project_id"`
+	InviteeRef string    `json:"invitee_ref"`
+	Role       string    `json:"role"`
+	InvitedBy  string    `json:"invited_by"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+// ProjectInvitation is an invitation as its invitee sees it, with the project it is for.
+type ProjectInvitation struct {
+	Invitation Invitation `json:"invitation"`
+	Project    Project    `json:"project"`
+}
+
+// ActorRequest names the user asking, about their own projects or invitations.
+type ActorRequest struct {
+	ActorRef string `json:"actor_ref"`
+}
+
+type CreateProjectRequest struct {
+	ActorRef string `json:"actor_ref"`
+	Name     string `json:"name"`
+}
+
+type RenameProjectRequest struct {
+	Access
+	Name string `json:"name"`
+}
+
+// MemberRequest names a member of the project. Role is set only to change theirs.
+type MemberRequest struct {
+	Access
+	UserRef string `json:"user_ref"`
+	Role    string `json:"role,omitempty"`
+}
+
+// TransferOwnershipRequest hands the project to the member at UserRef. FormerOwnerRole is what the
+// owner keeps: editor or viewer.
+type TransferOwnershipRequest struct {
+	Access
+	UserRef         string `json:"user_ref"`
+	FormerOwnerRole string `json:"former_owner_role"`
+}
+
+type InviteRequest struct {
+	Access
+	InviteeRef string `json:"invitee_ref"`
+	Role       string `json:"role"`
+}
+
+// InviteeRequest is the invitee answering an invitation.
+type InviteeRequest struct {
+	ActorRef string `json:"actor_ref"`
+	ID       string `json:"id"`
+}
+
+type ProjectResponse struct {
+	Project Project `json:"project"`
+}
+
+type MembershipResponse struct {
+	Membership Membership `json:"membership"`
+}
+
+type ListMembershipsResponse struct {
+	Memberships []Membership `json:"memberships"`
+}
+
+type MemberResponse struct {
+	Member Member `json:"member"`
+}
+
+type ListMembersResponse struct {
+	Members []Member `json:"members"`
+}
+
+type InvitationResponse struct {
+	Invitation Invitation `json:"invitation"`
+}
+
+type ListInvitationsResponse struct {
+	Invitations []Invitation `json:"invitations"`
+}
+
+type ListProjectInvitationsResponse struct {
+	Invitations []ProjectInvitation `json:"invitations"`
 }
 
 // Empty is the request or response of an operation that carries nothing.

@@ -84,6 +84,13 @@ func TestCallOnlyReportsADomainErrorForAWellFormedEnvelope(t *testing.T) {
 			wantCode:    httpx.CodeConflict,
 		},
 		{
+			name:        "forbidden",
+			status:      http.StatusForbidden,
+			contentType: "application/json",
+			body:        `{"code":"forbidden","message":"Your role does not allow that."}`,
+			wantCode:    httpx.CodeForbidden,
+		},
+		{
 			name:        "charset on the content type is still json",
 			status:      http.StatusNotFound,
 			contentType: "application/json; charset=utf-8",

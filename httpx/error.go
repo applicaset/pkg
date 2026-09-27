@@ -5,21 +5,22 @@ package httpx
 
 import "net/http"
 
-// Code is the wire vocabulary: the only three ways a request, rather than the system, can be at
-// fault. Anything else is a failure and must never be mistaken for an answer.
+// Code is the wire vocabulary: the only ways a request, rather than the system, can be at fault.
+// Anything else is a failure and must never be mistaken for an answer.
 type Code string
 
 const (
 	CodeNotFound     Code = "not_found"
 	CodeInvalidInput Code = "invalid_input"
 	CodeConflict     Code = "conflict"
+	CodeForbidden    Code = "forbidden"
 )
 
 // Known reports whether this is a code a client may act on. A code it does not recognise is a
 // failure of the system, not a domain answer.
 func (c Code) Known() bool {
 	switch c {
-	case CodeNotFound, CodeInvalidInput, CodeConflict:
+	case CodeNotFound, CodeInvalidInput, CodeConflict, CodeForbidden:
 		return true
 	default:
 		return false
@@ -35,6 +36,8 @@ func (c Code) Status() int {
 		return http.StatusBadRequest
 	case CodeConflict:
 		return http.StatusConflict
+	case CodeForbidden:
+		return http.StatusForbidden
 	default:
 		return http.StatusInternalServerError
 	}

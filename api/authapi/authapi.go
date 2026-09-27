@@ -7,10 +7,13 @@ package authapi
 const (
 	PathResolveSession = "/v1/resolve-session"
 	PathGetUser        = "/v1/get-user"
-	PathListUsers      = "/v1/list-users"
-	PathUpdateProfile  = "/v1/update-profile"
-	PathDeleteUser     = "/v1/delete-user"
-	PathSetupOpen      = "/v1/setup-open"
+	// PathGetUserByUsername tells whether a username exists. That is no secret from a signed-in
+	// site: usernames are shown to every member of a shared project.
+	PathGetUserByUsername = "/v1/get-user-by-username"
+	PathListUsers         = "/v1/list-users"
+	PathUpdateProfile     = "/v1/update-profile"
+	PathDeleteUser        = "/v1/delete-user"
+	PathSetupOpen         = "/v1/setup-open"
 )
 
 // User carries no credentials and no timestamps: nothing outside the identity service reads them.
@@ -33,6 +36,10 @@ type UserResponse struct {
 
 type GetUserRequest struct {
 	UserRef string `json:"user_ref"`
+}
+
+type GetUserByUsernameRequest struct {
+	Username string `json:"username"`
 }
 
 type ListUsersRequest struct {
