@@ -23,6 +23,8 @@ const (
 	PathGetTransaction    = "/v1/get-transaction"
 	PathListTransactions  = "/v1/list-transactions"
 	PathCreateTransfer    = "/v1/create-transfer"
+	PathGetTransfer       = "/v1/get-transfer"
+	PathUpdateTransfer    = "/v1/update-transfer"
 	PathSummarize         = "/v1/summarize"
 )
 
@@ -132,7 +134,9 @@ type ListTransactionsResponse struct {
 	Transactions []Transaction `json:"transactions"`
 }
 
-type CreateTransferRequest struct {
+// TransferRequest creates a transfer, or updates the one either half named by ID belongs to.
+type TransferRequest struct {
+	ID           string `json:"id,omitempty"`
 	OwnerRef     string `json:"owner_ref"`
 	FromWalletID string `json:"from_wallet_id"`
 	ToWalletID   string `json:"to_wallet_id"`
@@ -144,6 +148,7 @@ type CreateTransferRequest struct {
 }
 
 type TransferResponse struct {
+	ID  string      `json:"id"`
 	Out Transaction `json:"out"`
 	In  Transaction `json:"in"`
 }
