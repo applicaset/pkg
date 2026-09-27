@@ -1,5 +1,0 @@
-@layer components {
-    .as-back-link {
-        @apply inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-fg;
-    }
-}

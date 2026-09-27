@@ -1,5 +1,0 @@
-@layer components {
-    .as-card {
-        @apply rounded-md border border-border p-4;
-    }
-}

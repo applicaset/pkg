@@ -1,5 +1,0 @@
-@layer components {
-    .as-hint {
-        @apply text-sm text-muted;
-    }
-}

@@ -1,5 +1,0 @@
-@layer components {
-    .as-field {
-        @apply flex flex-col gap-1.5 text-sm font-medium;
-    }
-}
