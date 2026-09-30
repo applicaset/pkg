@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/buildset/buildset/pkg/reqid"
+	"github.com/applicaset/buildset/pkg/reqid"
 )
 
 const (

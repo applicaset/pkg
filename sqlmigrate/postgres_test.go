@@ -5,8 +5,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/buildset/buildset/pkg/pgtest"
-	"github.com/buildset/buildset/pkg/sqlmigrate"
+	"github.com/applicaset/buildset/pkg/pgtest"
+	"github.com/applicaset/buildset/pkg/sqlmigrate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

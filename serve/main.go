@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/buildset/buildset/pkg/config"
+	"github.com/applicaset/buildset/pkg/config"
 	"github.com/joho/godotenv"
 )
 
