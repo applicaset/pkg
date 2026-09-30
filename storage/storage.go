@@ -15,7 +15,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// Both are supported everywhere; SQLite is the default because it needs nothing to be running.
+// SQLite is the default because it needs nothing to be running.
 const (
 	DriverSQLite   = "sqlite"
 	DriverPostgres = "postgres"
@@ -160,4 +160,35 @@ func serviceDSN(dsn, schema string) (string, error) {
 	}
 
 	return parsed.String(), nil
+}
+
+// Handle is one service's open database.
+type Handle struct {
+	SQL *sql.DB
+}
+
+// OpenHandle opens the configured database for the service owning schema.
+func OpenHandle(ctx context.Context, cfg Config, schema string) (*Handle, error) {
+	db, err := Open(ctx, cfg, schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Handle{SQL: db}, nil
+}
+
+func (h *Handle) Ping(ctx context.Context) error {
+	if err := h.SQL.PingContext(ctx); err != nil {
+		return fmt.Errorf("ping database: %w", err)
+	}
+
+	return nil
+}
+
+func (h *Handle) Close() error {
+	if err := h.SQL.Close(); err != nil {
+		return fmt.Errorf("close database: %w", err)
+	}
+
+	return nil
 }

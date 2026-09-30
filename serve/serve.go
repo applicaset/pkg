@@ -34,6 +34,10 @@ type Options struct {
 	// for a JSON API on a private network that no browser ever sees.
 	CrossOrigin bool
 
+	// CrossOriginBypass are ServeMux patterns exempt from CrossOrigin, for a callback another site
+	// must POST to, such as Sign in with Apple's. Each must defend itself, with a state parameter.
+	CrossOriginBypass []string
+
 	// TrustRequestID honours an inbound X-Request-Id. True only where the caller is a sibling
 	// service, never on anything reachable through the gateway.
 	TrustRequestID bool
@@ -83,7 +87,12 @@ func Handler(opts Options) http.Handler {
 		// Rejects cross-origin state-changing requests using Sec-Fetch-Site, falling back to Origin.
 		// TODO: requests carrying neither header are allowed through. Combined with SameSite=Lax that
 		// leaves only pre-2023 browsers exposed; add session-bound form tokens if those must be supported.
-		handler = http.NewCrossOriginProtection().Handler(handler)
+		protection := http.NewCrossOriginProtection()
+		for _, pattern := range opts.CrossOriginBypass {
+			protection.AddInsecureBypassPattern(pattern)
+		}
+
+		handler = protection.Handler(handler)
 	}
 
 	// The identifier is applied first so everything below it can log it.

@@ -107,3 +107,7 @@ func (s *statusRecorder) WriteHeader(status int) {
 	s.wroteHeader = true
 	s.ResponseWriter.WriteHeader(status)
 }
+
+// Unwrap lets http.ResponseController reach the connection beneath, so a streaming handler can
+// flush and lift its write deadline.
+func (s *statusRecorder) Unwrap() http.ResponseWriter { return s.ResponseWriter }
