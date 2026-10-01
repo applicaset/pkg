@@ -9,6 +9,7 @@ const (
 	PathRevokeRole    = "/v1/revoke-role"
 	PathSubjectRoles  = "/v1/subject-roles"
 	PathListRoles     = "/v1/roles"
+	PathDefineRole    = "/v1/define-role"
 	PathPurgeResource = "/v1/purge-resource"
 	PathPurgeSubject  = "/v1/purge-subject"
 )
@@ -40,6 +41,19 @@ type SubjectRequest struct {
 
 type ResourceRequest struct {
 	Resource string `json:"resource"`
+}
+
+// Permission is an action over a resource. Either may end in a wildcard.
+type Permission struct {
+	Action   string `json:"action"`
+	Resource string `json:"resource"`
+}
+
+// DefineRoleRequest creates a role or replaces its description and permissions.
+type DefineRoleRequest struct {
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Permissions []Permission `json:"permissions"`
 }
 
 // RolesResponse carries role names only. No caller reads a description.

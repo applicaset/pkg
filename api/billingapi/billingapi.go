@@ -9,6 +9,7 @@ import "time"
 
 const (
 	PathGetAccess        = "/v1/get-access"
+	PathSetCanCharge     = "/v1/set-can-charge"
 	PathListWallets      = "/v1/list-wallets"
 	PathListAllWallets   = "/v1/list-all-wallets"
 	PathListTransactions = "/v1/list-transactions"
@@ -74,8 +75,21 @@ type ActorRequest struct {
 	ActorRef string `json:"actor_ref"`
 }
 
+// AccessRequest asks what SubjectRef may do. Only an admin may ask about someone else.
+type AccessRequest struct {
+	ActorRequest
+	SubjectRef string `json:"subject_ref"`
+}
+
 type AccessResponse struct {
-	Admin bool `json:"admin"`
+	Admin     bool `json:"admin"`
+	CanCharge bool `json:"can_charge"`
+}
+
+type SetCanChargeRequest struct {
+	ActorRequest
+	UserRef string `json:"user_ref"`
+	Allowed bool   `json:"allowed"`
 }
 
 type ListWalletsRequest struct {
