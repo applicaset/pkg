@@ -16,6 +16,9 @@ const (
 	PathDeposit          = "/v1/deposit"
 	PathWithdraw         = "/v1/withdraw"
 	PathExchange         = "/v1/exchange"
+	PathUpdateMove       = "/v1/update-move"
+	PathUpdateExchange   = "/v1/update-exchange"
+	PathDeleteMove       = "/v1/delete-move"
 	PathCreateCharge     = "/v1/create-charge"
 	PathUpdateCharge     = "/v1/update-charge"
 	PathDeleteCharge     = "/v1/delete-charge"
@@ -106,6 +109,7 @@ type ListTransactionsRequest struct {
 	OwnerRef string `json:"owner_ref,omitempty"`
 	Currency string `json:"currency,omitempty"`
 	ChargeID string `json:"charge_id,omitempty"`
+	GroupID  string `json:"group_id,omitempty"`
 }
 
 type ListTransactionsResponse struct {
@@ -132,6 +136,32 @@ type ExchangeRequest struct {
 	Amount       string `json:"amount"`
 	Rate         string `json:"rate"`
 	Note         string `json:"note,omitempty"`
+}
+
+// MoveEditRequest changes the deposit or withdrawal of a group.
+type MoveEditRequest struct {
+	ActorRequest
+	GroupID  string `json:"group_id"`
+	Currency string `json:"currency"`
+	Amount   string `json:"amount"`
+	Note     string `json:"note,omitempty"`
+}
+
+// ExchangeEditRequest changes the exchange of a group.
+type ExchangeEditRequest struct {
+	ActorRequest
+	GroupID      string `json:"group_id"`
+	FromCurrency string `json:"from_currency"`
+	ToCurrency   string `json:"to_currency"`
+	Amount       string `json:"amount"`
+	Rate         string `json:"rate"`
+	Note         string `json:"note,omitempty"`
+}
+
+// GroupRequest names the transactions one admin move wrote.
+type GroupRequest struct {
+	ActorRequest
+	GroupID string `json:"group_id"`
 }
 
 type ChargeRequest struct {
