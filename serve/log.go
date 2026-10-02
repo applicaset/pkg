@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/SladkyCitron/slogcolor"
-	"github.com/applicaset/buildset/pkg/config"
-	"github.com/applicaset/buildset/pkg/reqid"
+	"github.com/applicaset/pkg/config"
+	"github.com/applicaset/pkg/reqid"
 )
 
 // NewLogger builds the logger every binary uses.

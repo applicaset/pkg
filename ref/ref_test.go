@@ -3,7 +3,7 @@ package ref_test
 import (
 	"testing"
 
-	"github.com/applicaset/buildset/pkg/ref"
+	"github.com/applicaset/pkg/ref"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

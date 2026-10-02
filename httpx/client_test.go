@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/applicaset/buildset/pkg/httpx"
-	"github.com/applicaset/buildset/pkg/reqid"
+	"github.com/applicaset/pkg/httpx"
+	"github.com/applicaset/pkg/reqid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/applicaset/buildset/pkg/sqlmigrate"
+	"github.com/applicaset/pkg/sqlmigrate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"

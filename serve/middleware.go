@@ -6,7 +6,7 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/applicaset/buildset/pkg/reqid"
+	"github.com/applicaset/pkg/reqid"
 )
 
 // WithRequestID honours an inbound identifier only when trustInbound is set. Set it for an internal

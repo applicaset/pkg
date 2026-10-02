@@ -1,4 +1,4 @@
-module github.com/applicaset/buildset/pkg
+module github.com/applicaset/pkg
 
 go 1.27.1
 
