@@ -14,10 +14,12 @@ const (
 	PathPurgeSubject  = "/v1/purge-subject"
 )
 
+// CanRequest asks for the subject alone, or also for the groups it belongs to.
 type CanRequest struct {
-	Subject  string `json:"subject"`
-	Action   string `json:"action"`
-	Resource string `json:"resource"`
+	Subject  string   `json:"subject"`
+	Groups   []string `json:"groups,omitempty"`
+	Action   string   `json:"action"`
+	Resource string   `json:"resource"`
 }
 
 type CanResponse struct {

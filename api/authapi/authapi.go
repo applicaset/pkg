@@ -22,6 +22,9 @@ type User struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	Name     string `json:"name"`
+	// Groups are the refs of the groups the user belongs to, for an authorization check. Only a
+	// resolved session carries them.
+	Groups []string `json:"groups,omitempty"`
 }
 
 // ResolveSessionRequest carries a live session token. Nothing may log it. The token rides in the
