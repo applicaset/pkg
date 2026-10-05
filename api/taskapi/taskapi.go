@@ -7,20 +7,22 @@ import "time"
 // Every request names the acting user. The service trusts it: only sibling services on the private
 // network reach these paths, and the site has already resolved the session.
 const (
-	PathRoot          = "/v1/root"
-	PathPage          = "/v1/page"
-	PathCreate        = "/v1/create"
-	PathRename        = "/v1/rename"
-	PathDescribe      = "/v1/describe"
-	PathSetCompleted  = "/v1/set-completed"
-	PathReorder       = "/v1/reorder"
-	PathMove          = "/v1/move"
-	PathDelete        = "/v1/delete"
-	PathUndo          = "/v1/undo"
-	PathAddComment    = "/v1/add-comment"
-	PathEditComment   = "/v1/edit-comment"
-	PathDeleteComment = "/v1/delete-comment"
-	PathContact       = "/v1/contact"
+	PathRoot         = "/v1/root"
+	PathPage         = "/v1/page"
+	PathCreate       = "/v1/create"
+	PathRename       = "/v1/rename"
+	PathDescribe     = "/v1/describe"
+	PathSetCompleted = "/v1/set-completed"
+	PathReorder      = "/v1/reorder"
+	PathMove         = "/v1/move"
+	PathDelete       = "/v1/delete"
+	PathUndo         = "/v1/undo"
+	PathContact      = "/v1/contact"
+	// PathAuthorizeComment answers with the task when the actor may comment on it. The comments
+	// live in the discuss service, which leaves that decision to its caller.
+	PathAuthorizeComment = "/v1/authorize-comment"
+	// PathNotifyChanged tells the task's open pages that its comments changed.
+	PathNotifyChanged = "/v1/notify-changed"
 	// PathEvents answers with a text/event-stream of changed task ids, until the caller hangs up.
 	PathEvents = "/v1/events"
 )
@@ -47,24 +49,16 @@ type Task struct {
 func (t Task) IsRoot() bool { return t.ParentID == "" }
 
 type Activity struct {
-	ID              string     `json:"id"`
-	Kind            string     `json:"kind"`
-	TaskID          string     `json:"task_id"`
-	AuthorID        string     `json:"author_id"`
-	Type            string     `json:"type"`
-	Count           int        `json:"count"`
-	From            string     `json:"from"`
-	To              string     `json:"to"`
-	Body            string     `json:"body"`
-	BodyRevision    int        `json:"body_revision"`
-	ParentCommentID string     `json:"parent_comment_id"`
-	EditedAt        *time.Time `json:"edited_at,omitempty"`
-	DeletedAt       *time.Time `json:"deleted_at,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID        string    `json:"id"`
+	TaskID    string    `json:"task_id"`
+	AuthorID  string    `json:"author_id"`
+	Type      string    `json:"type"`
+	Count     int       `json:"count"`
+	From      string    `json:"from"`
+	To        string    `json:"to"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
-
-func (a Activity) IsComment() bool { return a.Kind == "comment" }
 
 type Page struct {
 	Task     Task       `json:"task"`
@@ -126,25 +120,6 @@ type MoveRequest struct {
 	ActorID string `json:"actor_id"`
 	TaskID  string `json:"task_id"`
 	Offset  int    `json:"offset"`
-}
-
-type AddCommentRequest struct {
-	ActorID         string `json:"actor_id"`
-	TaskID          string `json:"task_id"`
-	ParentCommentID string `json:"parent_comment_id"`
-	Body            string `json:"body"`
-}
-
-type EditCommentRequest struct {
-	ActorID   string `json:"actor_id"`
-	CommentID string `json:"comment_id"`
-	Revision  int    `json:"revision"`
-	Body      string `json:"body"`
-}
-
-type CommentRequest struct {
-	ActorID   string `json:"actor_id"`
-	CommentID string `json:"comment_id"`
 }
 
 type ContactRequest struct {
