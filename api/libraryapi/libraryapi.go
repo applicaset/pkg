@@ -373,6 +373,8 @@ type ArtistPatch struct {
 	Name  *string   `json:"name,omitempty"`
 	Bio   *string   `json:"bio,omitempty"`
 	Links *[]string `json:"links,omitempty"`
+	// AllowMerge lets a name another artist has merge the two. Without it, that edit is a conflict.
+	AllowMerge bool `json:"allow_merge,omitempty"`
 }
 
 type EditArtistRequest struct {
@@ -431,6 +433,9 @@ type AlbumPatch struct {
 	Artist *string `json:"artist,omitempty"`
 	Year   *int    `json:"year,omitempty"`
 	Kind   *string `json:"kind,omitempty"`
+	// AllowMerge lets a title and artist another album has merge the two. Without it, that edit
+	// is a conflict.
+	AllowMerge bool `json:"allow_merge,omitempty"`
 }
 
 type EditAlbumRequest struct {
